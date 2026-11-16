@@ -32,9 +32,12 @@ them in `pricing.html` AND in the Supabase `plans` rows (migration
 
 ## Going live (you do this — nothing to install)
 
-1. **Dodo Payments**: create 2 monthly products (Pro $12, Studio $29),
-   copy their product IDs into `PLANS` in `site-config.js`, and set the
-   Return URL to `…/success.html`.
+1. **Dodo Payments**: with the dashboard **Test Mode toggle ON**, create 2
+   monthly products (Pro $12, Studio $29), copy their test product IDs
+   into `PLANS` in `site-config.js`. No return-URL setup needed — the page
+   sends `success.html` as `redirect_url` on every link. Going live later
+   means: new live products, live IDs in `PLANS`, and
+   `DODO_CHECKOUT_BASE` back to `https://checkout.dodopayments.com/buy`.
 2. **Supabase** → Authentication → URL Configuration: Site URL =
    `…/verify.html` (+ add to Redirect URLs). Keep **Confirm email** on;
    signup links will land on `verify.html`.

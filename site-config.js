@@ -4,8 +4,9 @@
 //   1. Dodo Payments dashboard → create 3 monthly Products (Free needs no
 //      product — it is the default Supabase plan). Paste each Product ID
 //      into PLANS below (format: prod_... or live product slug).
-//   2. Dodo Payments dashboard → set the checkout Return URL to
-//      <SITE_URL>/success.html (Dodo appends ?status=...&...).
+//   2. Nothing to set in Dodo for returns: pricing.js passes
+//      <SITE_URL>/success.html as `redirect_url` on every payment link
+//      (Dodo appends ?status=...&...).
 //   3. Supabase dashboard → Authentication → URL Configuration → Site URL
 //      = <SITE_URL>/verify.html, and add it under Redirect URLs.
 //      Email template "{{ .ConfirmationURL }}" will then land here.
@@ -14,7 +15,9 @@
 
 window.CaptifySite = {
   // Public origin of this site, no trailing slash. Used to build absolute
-  // links the extension and Supabase redirect to.
+  // links the extension and Supabase redirect to. Serve this folder on the
+  // same port (e.g. `python -m http.server 8080`) so the Dodo `redirect_url`
+  // lands back here after test checkout.
   SITE_URL: "http://localhost:8080",
 
   // Supabase project (public anon key only — same values as
@@ -23,12 +26,15 @@ window.CaptifySite = {
   SUPABASE_ANON_KEY: "sb_publishable_namQsShONsZJviiyWtulnA_wZ4NWUPW",
 
   // Dodo Payments static payment-link base:
-  // `https://checkout.dodopayments.com/buy/{product_id}`. Per Dodo's docs,
-  // payment links take `redirect_url` (required — where Dodo sends the
-  // customer back, appending payment_id/status/email), `email` to pre-fill,
-  // and custom fields as `metadata_*` (e.g. metadata_user_id). Native
-  // checkout links need no SDK and no npm install.
-  DODO_CHECKOUT_BASE: "https://checkout.dodopayments.com/buy",
+  // `https://{checkout,test.checkout}.dodopayments.com/buy/{product_id}`.
+  // TEST MODE uses test.checkout.dodopayments.com and test products; LIVE
+  // uses checkout.dodopayments.com and live products — switch this base
+  // (and the product IDs) when you go live. Per Dodo's docs, payment links
+  // take `redirect_url` (required — where Dodo sends the customer back,
+  // appending payment_id/status/email), `email` to pre-fill, and custom
+  // fields as `metadata_*` (e.g. metadata_user_id). Native checkout links
+  // need no SDK and no npm install.
+  DODO_CHECKOUT_BASE: "https://test.checkout.dodopayments.com/buy",
 
   // One entry per paid plan. `dodoProductId` is the ONLY value you must
   // replace with a real Dodo product id. `id` must match the `plans.id`
@@ -46,13 +52,13 @@ window.CaptifySite = {
       id: "pro",
       name: "Pro",
       priceMonthlyUSD: 12,
-      dodoProductId: "REPLACE_WITH_DODO_PRO_PRODUCT_ID",
+      dodoProductId: "pdt_0Ns4n6DtVvE5GFaoMwVqt",
     },
     {
       id: "studio",
       name: "Studio",
       priceMonthlyUSD: 29,
-      dodoProductId: "REPLACE_WITH_DODO_STUDIO_PRODUCT_ID",
+      dodoProductId: "pdt_0Ns4qzhAbSngnV0wZOLYf",
     },
   ],
 };
