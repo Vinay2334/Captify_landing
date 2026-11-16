@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Captify — Verify your email</title>
+  <meta name="description" content="Confirm your Captify account email, then sign in to the extension." />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-head">
+    <div class="wrap">
+      <a class="brand" href="index.html"><span class="brand-mark">C</span>Captify</a>
+      <nav>
+        <a href="index.html">Home</a>
+        <a href="pricing.html">Pricing</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="status-card" aria-live="polite">
+      <div id="verify-loading">
+        <div class="spinner" aria-hidden="true"></div>
+        <h1>Confirming your email…</h1>
+        <p>One moment while we check the link from your inbox.</p>
+      </div>
+
+      <div id="verify-ok" hidden>
+        <h1><span class="ok">Email verified</span></h1>
+        <p id="verify-ok-text">
+          Your email is confirmed. Open the Captify extension and sign in —
+          captions are unlocked.
+        </p>
+        <div class="actions">
+          <a class="btn btn-primary" href="pricing.html">See plans</a>
+        </div>
+      </div>
+
+      <div id="verify-error" hidden>
+        <h1><span class="err">Link didn't work</span></h1>
+        <p id="verify-error-text">
+          This confirmation link is invalid or expired. Request a new one from
+          the extension sign-in page and try again.
+        </p>
+        <p>
+          If you already confirmed your email earlier, just open the extension
+          and sign in — you're good to go.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-foot">
+    <div class="wrap">Captify · Email verification</div>
+  </footer>
+
+  <script src="site-config.js"></script>
+  <script src="verify.js"></script>
+</body>
+</html>

@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Captify — Payment received</title>
+  <meta name="description" content="Your Captify upgrade is on its way." />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-head">
+    <div class="wrap">
+      <a class="brand" href="index.html"><span class="brand-mark">C</span>Captify</a>
+      <nav>
+        <a href="index.html">Home</a>
+        <a href="pricing.html">Pricing</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="status-card" aria-live="polite">
+      <!-- Dodo redirects here after checkout: pricing.js passes this page as
+           the required `redirect_url` on every static payment link. Dodo
+           appends status/payment_id/email as query params. -->
+      <div id="pay-ok">
+        <h1><span class="ok">Payment received</span></h1>
+        <p>
+          Thanks — your upgrade is being applied. It usually takes under a
+          minute: reopen the Captify extension menu to see your new plan and
+          minutes.
+        </p>
+        <p>
+          Make sure the email you paid with matches the email you use in the
+          extension, or the minutes can't find your account.
+        </p>
+      </div>
+
+      <div id="pay-issue" hidden>
+        <h1><span class="err">Checkout didn't finish</span></h1>
+        <p>
+          The payment didn't complete. No minutes were added — you can try
+          again from the pricing page.
+        </p>
+        <div class="actions">
+          <a class="btn btn-primary" href="pricing.html">Back to plans</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-foot">
+    <div class="wrap">Captify · Payments securely processed by Dodo Payments</div>
+  </footer>
+
+  <script>
+    // Dodo appends ?status=cancelled (or an error) when checkout is
+    // abandoned. Anything else means the payment went through and the
+    // Dodo webhook (see EXTENSION_WIRING.md) upgrades the account.
+    (function () {
+      var q = {};
+      try {
+        String(location.search || "").replace(/^\?/, "").split("&").forEach(function (p) {
+          var i = p.indexOf("=");
+          if (i > 0) q[decodeURIComponent(p.slice(0, i))] = decodeURIComponent(p.slice(i + 1));
+        });
+      } catch (e) { /* treat as success */ }
+      var s = String(q.status || q.state || "").toLowerCase();
+      var bad = ["cancelled", "canceled", "failed", "error", "expired"];
+      var isBad = bad.some(function (b) { return s.indexOf(b) !== -1; });
+      document.getElementById("pay-ok").hidden = isBad;
+      document.getElementById("pay-issue").hidden = !isBad;
+    })();
+  </script>
+</body>
+</html>
