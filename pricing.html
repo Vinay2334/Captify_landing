@@ -28,6 +28,11 @@
       <span class="billing-note">Monthly billing · Cancel anytime · Secure checkout by Dodo Payments</span>
     </section>
 
+    <div class="account-bar" aria-live="polite">
+      <span id="account-status">Checking sign-in…</span>
+      <a id="account-action" href="signin.html">Sign in</a>
+    </div>
+
     <section class="plans" aria-label="Plans">
       <article class="plan">
         <h2>Starter</h2>
@@ -100,9 +105,10 @@
         </details>
         <details>
           <summary>How does the extension know I paid?</summary>
-          <p>Use the same email at checkout as in the extension. Dodo notifies
-          our server, which moves your account to the new plan — usually
-          within a minute. Reopen the extension menu to see it.</p>
+          <p>Sign in on this page before checking out and the plan is linked
+          to your account automatically — you can pay with any email. Dodo
+          notifies our server, which moves your account to the new plan,
+          usually within a minute. Reopen the extension menu to see it.</p>
         </details>
         <details>
           <summary>Can I switch plans later?</summary>
@@ -121,6 +127,7 @@
   </footer>
 
   <script src="site-config.js"></script>
+  <script src="auth.js"></script>
   <script src="pricing.js"></script>
 </body>
 </html>

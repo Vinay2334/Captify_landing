@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Captify — Sign in</title>
+  <meta name="description" content="Sign in to Captify to upgrade your plan. Checkout is linked to your account." />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-head">
+    <div class="wrap">
+      <a class="brand" href="index.html"><span class="brand-mark">C</span>Captify</a>
+      <nav>
+        <a href="index.html">Home</a>
+        <a href="pricing.html">Pricing</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="status-card" aria-live="polite">
+      <!-- Shown while the page decides: Google return, existing session. -->
+      <div id="signin-loading">
+        <h1>Sign in to Captify</h1>
+        <div class="spinner" aria-hidden="true"></div>
+        <p>Checking your session…</p>
+      </div>
+
+      <div id="signin-form-wrap" hidden>
+        <h1 id="signin-title">Sign in to continue</h1>
+        <p id="signin-subtitle">Your upgrade is linked to this account — you can pay with any email.</p>
+        <form id="signin-form" novalidate>
+          <div id="signin-name-row" hidden>
+            <label class="field">
+              <span>First name</span>
+              <input id="signin-firstname" type="text" autocomplete="given-name" />
+            </label>
+            <label class="field">
+              <span>Last name</span>
+              <input id="signin-lastname" type="text" autocomplete="family-name" />
+            </label>
+          </div>
+          <label class="field">
+            <span>Email</span>
+            <input id="signin-email" type="email" required autocomplete="email" />
+          </label>
+          <label class="field">
+            <span>Password</span>
+            <input id="signin-password" type="password" required autocomplete="current-password" minlength="6" />
+          </label>
+          <p id="signin-error" class="form-error" hidden></p>
+          <div class="actions">
+            <button id="signin-submit" class="btn btn-primary" type="submit">Sign in</button>
+            <button id="signin-google" class="btn btn-ghost" type="button">Continue with Google</button>
+          </div>
+        </form>
+        <p class="switch-line">
+          <span id="signin-toggle-message">Don't have an account?</span>
+          <button id="signin-toggle" class="linklike" type="button">Sign Up</button>
+        </p>
+      </div>
+
+      <div id="signin-done" hidden>
+        <h1><span class="ok">Signed in</span></h1>
+        <p id="signin-welcome"></p>
+        <div class="actions">
+          <button id="signin-continue" class="btn btn-primary" type="button">Continue</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-foot">
+    <div class="wrap">Captify · Payments securely processed by Dodo Payments</div>
+  </footer>
+
+  <script src="site-config.js"></script>
+  <script src="auth.js"></script>
+  <script src="signin.js"></script>
+</body>
+</html>

@@ -1,89 +1,118 @@
 // Pricing page behavior: wire plan buttons to Dodo Payments checkout.
 //
-// No SDK, no npm packages. Paid buttons redirect to Dodo's hosted checkout:
-//   {DODO_CHECKOUT_BASE}/{productId}?redirect_url=...&email=...&metadata_user_id=...
-// Dodo returns the customer to redirect_url (success.html) and appends
-// payment_id/status/email as query params.
+// Checkout is gated behind a site sign-in so every payment carries the
+// account's user id in metadata (the backend webhook reads it back and
+// applies the plan no matter which email is entered at checkout):
+//   signed in   -> Dodo hosted checkout with metadata_user_id set
+//   signed out  -> signin.html?next=<this page>&plan=<planId>, which
+//                  returns here signed in (pending plan continues).
 //
 // The extension appends ?email= and ?user_id= when it opens this page
-// (see EXTENSION_WIRING.md), so checkout is pre-attributed to the right
-// account. Manual visitors just type their account email at checkout.
+// (see EXTENSION_WIRING.md): those hints prefill checkout and the sign-in
+// form, but the site session's user is authoritative once signed in.
+// Manual visitors just sign in with their Captify account email.
 (function () {
   var cfg = window.CaptifySite || {};
+  var A = window.CaptifySiteAuth || {};
   var PLANS = cfg.PLANS || [];
 
   function params() {
-    var out = {};
-    try {
-      var search = String(location.search || "").replace(/^[?#]/, "");
-      search.split("&").forEach(function (part) {
-        var eq = part.indexOf("=");
-        var key = eq < 0 ? part : part.slice(0, eq);
-        if (!key) return;
-        try {
-          out[decodeURIComponent(key)] = decodeURIComponent(
-            eq < 0 ? "" : part.slice(eq + 1)
-          );
-        } catch (e) { /* keep raw */ }
-      });
-    } catch (e) { /* no query */ }
-    return out;
+    return A.parseParams ? A.parseParams(window.location.search) : {};
   }
 
   var query = params();
   var knownEmail = query.email || "";
   var knownUserId = query.user_id || "";
 
-  function checkoutUrl(plan) {
-    if (!plan || !plan.dodoProductId) return null;
-    var url =
-      String(cfg.DODO_CHECKOUT_BASE || "").replace(/\/$/, "") +
-      "/" +
-      encodeURIComponent(plan.dodoProductId);
-    // Dodo static-link params (see integration guide): redirect_url is
-    // required; metadata_* carries the account attribution the backend
-    // webhook reads back (metadata_user_id first, email as fallback).
-    var qs = [
-      "redirect_url=" +
-        encodeURIComponent(
-          String(cfg.SITE_URL || "").replace(/\/$/, "") + "/success.html"
-        ),
-    ];
-    if (knownEmail) qs.push("email=" + encodeURIComponent(knownEmail));
-    if (knownUserId)
-      qs.push("metadata_user_id=" + encodeURIComponent(knownUserId));
-    qs.push("metadata_plan_id=" + encodeURIComponent(plan.id));
-    return url + "?" + qs.join("&");
+  function planById(id) {
+    for (var i = 0; i < PLANS.length; i++) {
+      if (PLANS[i].id === id) return PLANS[i];
+    }
+    return null;
   }
 
   function isPlaceholder(plan) {
     return (
-      !plan.dodoProductId ||
-      /REPLACE_WITH/i.test(String(plan.dodoProductId))
+      !plan || !plan.dodoProductId || /REPLACE_WITH/i.test(String(plan.dodoProductId))
     );
   }
 
-  document.querySelectorAll("[data-checkout]").forEach(function (btn) {
-    var plan = PLANS.find(function (p) { return p.id === btn.getAttribute("data-plan"); });
-    if (!plan) return;
-    if (isPlaceholder(plan)) {
-      // Product IDs not pasted yet: keep the button visible but explain.
-      btn.addEventListener("click", function (e) {
-        e.preventDefault();
-        btn.textContent = "Checkout not connected yet";
-        btn.setAttribute("aria-disabled", "true");
-        setTimeout(function () {
-          btn.textContent =
-            btn.getAttribute("data-plan") === "pro"
-              ? "Upgrade to Pro"
-              : "Upgrade to Studio";
-          btn.removeAttribute("aria-disabled");
-        }, 2500);
-      });
-      return;
+  function currentUrl() {
+    try {
+      return window.location.href;
+    } catch (e) {
+      return "pricing.html";
     }
-    btn.href = checkoutUrl(plan) || "#";
-  });
+  }
+
+  // Fast synchronous identity: the stored session (with cached profile)
+  // when still usable, else the extension's URL hints. An async
+  // revalidation below corrects this if the stored token died.
+  function initialIdentity() {
+    var stored = null;
+    try {
+      stored = A.readStored ? A.readStored() : null;
+    } catch (e) {
+      stored = null;
+    }
+    if (stored && A.isUsable && A.isUsable(stored) && stored.user && stored.user.id) {
+      return A.resolveIdentity({ sessionUser: stored.user });
+    }
+    return A.resolveIdentity
+      ? A.resolveIdentity({ hintEmail: knownEmail, hintUserId: knownUserId })
+      : { signedIn: false, userId: knownUserId, email: knownEmail };
+  }
+
+  function checkoutHref(plan, identity) {
+    if (isPlaceholder(plan)) return null;
+    if (identity.signedIn && identity.userId) {
+      return A.buildCheckoutUrl(plan, identity);
+    }
+    return A.buildSigninUrl
+      ? A.buildSigninUrl(currentUrl(), { plan: plan.id, email: identity.email || knownEmail })
+      : null;
+  }
+
+  function paintAccount(identity) {
+    var status = document.getElementById("account-status");
+    var action = document.getElementById("account-action");
+    if (!status || !action) return;
+    if (identity.signedIn) {
+      status.textContent = "Signed in as " + (identity.email || "your account");
+      action.textContent = "Sign out";
+      action.href = "signin.html?action=signout&next=" + encodeURIComponent(currentUrl());
+    } else {
+      status.textContent = "Sign in to link checkout to your account";
+      action.textContent = "Sign in";
+      action.href = A.buildSigninUrl
+        ? A.buildSigninUrl(currentUrl(), { email: knownEmail })
+        : "signin.html";
+    }
+  }
+
+  function paintButtons(identity) {
+    document.querySelectorAll("[data-checkout]").forEach(function (btn) {
+      var plan = planById(btn.getAttribute("data-plan"));
+      if (!plan) return;
+      if (isPlaceholder(plan)) {
+        // Product IDs not pasted yet: keep the button visible but explain.
+        btn.addEventListener("click", function (e) {
+          e.preventDefault();
+          btn.textContent = "Checkout not connected yet";
+          btn.setAttribute("aria-disabled", "true");
+          setTimeout(function () {
+            btn.textContent =
+              btn.getAttribute("data-plan") === "pro"
+                ? "Upgrade to Pro"
+                : "Upgrade to Studio";
+            btn.removeAttribute("aria-disabled");
+          }, 2500);
+        });
+        return;
+      }
+      btn.href = checkoutHref(plan, identity) || "#";
+    });
+  }
 
   // Free plan: no checkout. Extension users already have it; web visitors
   // are sent to install/sign in. The extension passes ?from=extension.
@@ -95,4 +124,29 @@
       }
     });
   });
+
+  var identity = initialIdentity();
+  paintAccount(identity);
+  paintButtons(identity);
+
+  // Slow-path correction: the stored token may have died since it was
+  // saved (expiry, password change, revoke). Revalidate; if it is gone,
+  // fall back to the signed-out buttons so checkout can't carry a dead id.
+  if (A.ensureUser) {
+    A.ensureUser().then(function (found) {
+      var fresh = found && found.user
+        ? A.resolveIdentity({ sessionUser: found.user })
+        : A.resolveIdentity({ hintEmail: knownEmail, hintUserId: knownUserId });
+      if (
+        fresh.signedIn !== identity.signedIn ||
+        fresh.userId !== identity.userId
+      ) {
+        identity = fresh;
+        paintAccount(identity);
+        paintButtons(identity);
+      }
+    }).catch(function () {
+      /* stale buttons stay until the next load */
+    });
+  }
 })();

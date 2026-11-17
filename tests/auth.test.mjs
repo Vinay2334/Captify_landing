@@ -1,0 +1,182 @@
+// Coverage for the website auth + checkout helpers (website/auth.js):
+// param parsing, session usability, refresh clearing a dead token,
+// identity resolution (site session beats URL hints), and Dodo checkout
+// URL building. Plain node (node --test); no DOM needed.
+import test from "node:test";
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import vm from "node:vm";
+
+const SITE = {
+  SUPABASE_URL: "https://example.supabase.co",
+  SUPABASE_ANON_KEY: "anon-key",
+  SITE_URL: "http://localhost:8080",
+  DODO_CHECKOUT_BASE: "https://test.checkout.dodopayments.com/buy",
+  PLANS: [{ id: "pro", dodoProductId: "pdt_pro" }],
+};
+
+// Objects cross the vm realm boundary (different Object prototype), so
+// compare their JSON shape, not object identity.
+const norm = (v) => JSON.parse(JSON.stringify(v));
+
+function loadAuth({ fetchImpl = null, stored = {}, origin = "http://localhost:8080" } = {}) {
+  const mem = { ...stored };
+  const calls = [];
+  const window = {
+    CaptifySite: { ...SITE },
+    location: { origin, href: origin + "/pricing.html" },
+    localStorage: {
+      getItem: (k) => (k in mem ? mem[k] : null),
+      setItem: (k, v) => { mem[k] = String(v); },
+      removeItem: (k) => { delete mem[k]; },
+    },
+  };
+  const context = vm.createContext({
+    window,
+    console,
+    fetch: fetchImpl ||
+      (async (url) => {
+        calls.push(String(url));
+        return { ok: true, status: 200, json: async () => ({}) };
+      }),
+  });
+  vm.runInContext(
+    readFileSync(new URL("../auth.js", import.meta.url), "utf8"),
+    context,
+  );
+  return { auth: window.CaptifySiteAuth, mem, calls };
+}
+
+test("parseParams reads query and hash strings", () => {
+  const { auth } = loadAuth();
+  assert.deepEqual(norm(auth.parseParams("?next=a%20b&plan=pro")), { next: "a b", plan: "pro" });
+  assert.deepEqual(norm(auth.parseParams("#access_token=t&expires_in=3600")), {
+    access_token: "t",
+    expires_in: "3600",
+  });
+  assert.deepEqual(norm(auth.parseParams("")), {});
+});
+
+test("isUsable accepts live sessions and rejects dead ones", () => {
+  const { auth } = loadAuth();
+  const live = { access_token: "a", expires_at: Date.now() + 3600 * 1000 };
+  assert.equal(auth.isUsable(live), true);
+  assert.equal(auth.isUsable({ access_token: "a", expires_at: Date.now() - 1000 }), false);
+  assert.equal(auth.isUsable({ access_token: "a", expires_at: Date.now() + 1000 }), false);
+  assert.equal(auth.isUsable(null), false);
+  assert.equal(auth.isUsable({}), false);
+});
+
+test("sessionFromFragment normalizes Google return tokens", () => {
+  const { auth } = loadAuth();
+  const before = Date.now();
+  const s = auth.sessionFromFragment({ access_token: "a", refresh_token: "r", expires_in: "3600" });
+  assert.equal(s.access_token, "a");
+  assert.equal(s.refresh_token, "r");
+  assert.ok(s.expires_at > before);
+  assert.equal(auth.sessionFromFragment({}), null);
+});
+
+test("resolveIdentity prefers the site session over URL hints", () => {
+  const { auth } = loadAuth();
+  assert.deepEqual(
+    norm(auth.resolveIdentity({
+      sessionUser: { id: "u-1", email: "site@example.com" },
+      hintEmail: "other@example.com",
+      hintUserId: "u-9",
+    })),
+    { signedIn: true, userId: "u-1", email: "site@example.com" },
+  );
+  assert.deepEqual(
+    norm(auth.resolveIdentity({ hintEmail: "hint@example.com", hintUserId: "u-9" })),
+    { signedIn: false, userId: "u-9", email: "hint@example.com" },
+  );
+});
+
+test("buildCheckoutUrl stamps metadata and prefill", () => {
+  const { auth } = loadAuth();
+  const url = auth.buildCheckoutUrl(
+    { id: "pro", dodoProductId: "pdt_pro" },
+    { signedIn: true, userId: "u-1", email: "me@example.com" },
+  );
+  assert.ok(url.startsWith("https://test.checkout.dodopayments.com/buy/pdt_pro?"));
+  assert.ok(url.includes("redirect_url=" + encodeURIComponent("http://localhost:8080/success.html")));
+  assert.ok(url.includes("email=" + encodeURIComponent("me@example.com")));
+  assert.ok(url.includes("metadata_user_id=u-1"));
+  assert.ok(url.includes("metadata_plan_id=pro"));
+  assert.equal(auth.buildCheckoutUrl({ id: "pro" }, { userId: "u-1" }), null);
+});
+
+test("buildSigninUrl preserves next, plan, and email", () => {
+  const { auth } = loadAuth();
+  const url = auth.buildSigninUrl("pricing.html?from=extension", {
+    plan: "pro",
+    email: "me@example.com",
+  });
+  assert.ok(url.startsWith("signin.html?"));
+  assert.ok(url.includes("next=" + encodeURIComponent("pricing.html?from=extension")));
+  assert.ok(url.includes("plan=pro"));
+  assert.ok(url.includes("email=" + encodeURIComponent("me@example.com")));
+});
+
+test("googleAuthorizeUrl points at Supabase with the return page", () => {
+  const { auth } = loadAuth();
+  const url = auth.googleAuthorizeUrl("http://localhost:8080/signin.html");
+  assert.ok(url.includes("/auth/v1/authorize?provider=google"));
+  assert.ok(url.includes("redirect_to=" + encodeURIComponent("http://localhost:8080/signin.html")));
+});
+
+test("usable session returns its token without network", async () => {
+  const stored = {
+    captifySiteSession: JSON.stringify({
+      access_token: "live",
+      refresh_token: "r",
+      expires_at: Date.now() + 3600 * 1000,
+      user: { id: "u-1" },
+    }),
+  };
+  let fetched = 0;
+  const { auth } = loadAuth({
+    stored,
+    fetchImpl: async () => { fetched++; return { ok: true, status: 200, json: async () => ({}) }; },
+  });
+  assert.equal(await auth.getAccessToken(), "live");
+  assert.equal(fetched, 0);
+});
+
+test("stale session refreshes; rejected refresh clears the token", async () => {
+  const good = {
+    captifySiteSession: JSON.stringify({
+      access_token: "old",
+      refresh_token: "r",
+      expires_at: Date.now() - 1000,
+      user: { id: "u-1" },
+    }),
+  };
+  const okFetch = async (url) => {
+    if (String(url).includes("grant_type=refresh_token")) {
+      return {
+        ok: true,
+        status: 200,
+        json: async () => ({ access_token: "new", refresh_token: "r2", expires_in: 3600 }),
+      };
+    }
+    return { ok: true, status: 200, json: async () => ({}) };
+  };
+  const first = loadAuth({ stored: good, fetchImpl: okFetch });
+  assert.equal(await first.auth.getAccessToken(), "new");
+  assert.equal(JSON.parse(first.mem.captifySiteSession).access_token, "new");
+
+  const bad = {
+    captifySiteSession: JSON.stringify({
+      access_token: "old",
+      refresh_token: "r",
+      expires_at: Date.now() - 1000,
+      user: { id: "u-1" },
+    }),
+  };
+  const badFetch = async () => ({ ok: false, status: 401, json: async () => ({}) });
+  const second = loadAuth({ stored: bad, fetchImpl: badFetch });
+  assert.equal(await second.auth.getAccessToken(), null);
+  assert.equal(second.mem.captifySiteSession, undefined);
+});

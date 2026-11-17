@@ -3,30 +3,21 @@
 Three small extension changes connect the new site. All paths are relative
 to the repo root.
 
-## 1. "Upgrade to Pro" opens the payments page
+## 1. "Upgrade to Pro" opens the payments page — implemented
 
-Today `user-store.js` → `upgrade()` only notifies the service worker, and
-nothing handles the `"upgrade"` action (see
-`extensionRTC/src/service-worker.js` — only `sign-in`/`sign-out` are
-handled). Change `upgrade()` to open the pricing page with the account
-attached so checkout pre-fills:
+`user-store.js` → `upgrade()` builds the pricing URL with the account
+attached (`captifyConfig.pricingUrl(email, userId)` → `?from=extension`
+`&email=…&user_id=…`) and sends it to the service worker as
+`{ type: "captify-menu-action", action: "upgrade", url }`, which opens the
+tab after allow-listing it against its own `SITE_URL` constant. The relay
+exists because content scripts have no `chrome.tabs` — the URL is built
+where the account lives (and is covered by
+`extensionRTC/tests/user-store.test.mjs`), the worker only opens
+same-origin URLs.
 
-```js
-// extensionRTC/src/caption-overlay/lib/user-store.js
-upgrade() {
-  try {
-    var s = this.getState();
-    var q = new URLSearchParams({
-      from: "extension",
-      email: s.user?.email || "",
-    });
-    chrome.tabs?.create?.({ url: "https://YOUR-SITE/pricing.html?" + q });
-  } catch (e) { notifyBackend("upgrade"); }
-},
-```
-
-Replace `https://YOUR-SITE` with the deployed `SITE_URL` from
-`website/site-config.js`.
+Keep the three `SITE_URL` values in sync when deploying:
+`website/site-config.js`, `extensionRTC/.../supabase-config.js`,
+`extensionRTC/src/service-worker.js`.
 
 ## 2. "Check your inbox" points at the verify page
 

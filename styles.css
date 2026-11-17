@@ -208,6 +208,78 @@ a { color: var(--accent); }
 }
 .btn-ghost:hover { border-color: var(--muted); }
 
+/* ---- account bar (pricing) ---- */
+.account-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 10px 16px;
+  margin-top: 18px;
+  font-size: 14.5px;
+  color: var(--muted);
+}
+.account-bar a {
+  margin-left: auto;
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+/* ---- auth form (sign-in page) ---- */
+.field {
+  display: block;
+  margin: 0 0 14px;
+}
+.field span {
+  display: block;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.field input {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 11px 12px;
+  color: var(--text);
+  font-size: 15px;
+}
+.field input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.field input:disabled {
+  opacity: 0.5;
+}
+#signin-name-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.form-error {
+  color: var(--bad);
+  font-size: 14px;
+  margin: 0 0 14px;
+}
+.switch-line {
+  margin-top: 16px;
+  font-size: 14.5px;
+}
+.linklike {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--accent);
+  font-size: inherit;
+  font-weight: 650;
+  cursor: pointer;
+}
+#signin-subtitle { margin-top: -6px; }
+
 /* ---- fine print / faq ---- */
 .fineprint {
   color: var(--muted);

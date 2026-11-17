@@ -9,11 +9,12 @@ static host.
 | Page | Purpose |
 |---|---|
 | `index.html` | Landing page: cinema-themed pitch (mock player, filmstrip, where/how, plan teaser). Uses Tailwind via CDN, so it needs network when served |
-| `pricing.html` (+ `pricing.js`) | Payments page: all 3 monthly plans, checkout buttons via Dodo Payments hosted links |
+| `pricing.html` (+ `pricing.js`) | Payments page: all 3 monthly plans. Checkout is gated behind a site sign-in; buttons go to Dodo hosted links with `metadata_user_id`, or to `signin.html` first when signed out |
+| `signin.html` (+ `signin.js`) | Site sign-in / sign-up (email + Google) via Supabase Auth directly. Returns to `?next=` afterwards, or straight to a pending plan's Dodo checkout |
 | `verify.html` (+ `verify.js`) | Internal only — reached from Supabase confirmation emails, linked from nowhere on the site (set as Site URL in Supabase) |
 | `success.html` | Dodo checkout return page (passed as `redirect_url` on every payment link) |
 
-Shared: `styles.css`, `site-config.js` (all service wiring in one place).
+Shared: `styles.css`, `site-config.js` (all service wiring in one place), `auth.js` (Supabase session + checkout URL helpers for `pricing.js` / `signin.js`).
 
 ## Plans (monthly, USD)
 
@@ -40,7 +41,9 @@ them in `pricing.html` AND in the Supabase `plans` rows (migration
    `DODO_CHECKOUT_BASE` back to `https://checkout.dodopayments.com/buy`.
 2. **Supabase** → Authentication → URL Configuration: Site URL =
    `…/verify.html` (+ add to Redirect URLs). Keep **Confirm email** on;
-   signup links will land on `verify.html`.
+   signup links will land on `verify.html`. For Google sign-in on the
+   site, also add `…/signin.html` to Redirect URLs (Supabase returns the
+   OAuth tokens there).
 3. **Serve** this folder (any static host) and set `SITE_URL` in
    `site-config.js`.
 4. **Extension**: see `EXTENSION_WIRING.md`.
@@ -59,7 +62,9 @@ python -m http.server 8080
 + `app/services/billing.py`, tests in `tests/test_billing.py`). It verifies
 the Standard Webhooks signature, maps the Dodo product to a plan via
 `DODO_PLAN_MAP`, and sets `profiles.plan_id` — by `metadata_user_id` from
-the checkout link first, by matching the Dodo customer email second.
+the checkout link first (always present now: pricing gates checkout behind
+a site sign-in, so buyers can pay with any email), by matching the Dodo
+customer email second.
 `subscription.cancelled` / `subscription.expired` drop the account back to
 `DODO_FREE_PLAN_ID` (`free`). The quota flow (`authorize`/`commit`) picks
 the new plan up automatically on the next session.
