@@ -134,6 +134,37 @@ a { color: var(--accent); }
   border-radius: 999px;
   padding: 2px 12px;
 }
+/* Signed-in account's current plan: same flag treatment, good-tint. */
+.plan.is-current {
+  border-color: var(--good);
+  border-width: 2px;
+}
+.plan-flag--current {
+  background: var(--good);
+  color: #0b1410;
+}
+/* Disabled plan buttons (current plan, unavailable downgrades,
+   unconnected checkout): same ghost look, no pointer. */
+.plan .cta .btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* ---- dynamic plans loading / error ---- */
+/* Author display rules (flex below) beat the UA `[hidden] -> display:none`
+   mapping, so enforce it: hidden must always hide. */
+[hidden] {
+  display: none !important;
+}
+.plans-loading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--muted);
+  padding: 32px 0 8px;
+}
+.plans-loading p { margin: 0; }
+#plans-error { margin-top: 32px; }
 .plan h2 {
   margin: 0;
   font-size: 20px;

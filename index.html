@@ -239,7 +239,7 @@
       <div class="max-w-6xl mx-auto px-5 py-14 text-center">
         <h2 class="text-2xl font-bold m-0">Start free, upgrade for more minutes</h2>
         <p class="text-muted mt-3 mb-8">Monthly billing · Cancel anytime · Secure checkout by Dodo Payments</p>
-        <div class="flex flex-wrap justify-center gap-x-10 gap-y-3 text-left mb-8">
+        <div id="plan-teaser" class="flex flex-wrap justify-center gap-x-10 gap-y-3 text-left mb-8">
           <p class="m-0"><span class="font-bold">Starter · $0</span> <span class="text-muted">— 100 min/mo</span></p>
           <p class="m-0"><span class="font-bold">Pro · $12</span> <span class="text-muted">— 1,000 min/mo</span></p>
           <p class="m-0"><span class="font-bold">Studio · $29</span> <span class="text-muted">— 4,000 min/mo</span></p>
@@ -256,6 +256,37 @@
     </div>
   </footer>
 
+  <script src="site-config.js"></script>
+  <script src="auth.js"></script>
+  <script>
+    // Pricing teaser: re-render from the live plan catalog (DB-driven).
+    // The hardcoded lines above stay as the instant fallback when the
+    // backend is unreachable.
+    (function () {
+      var A = window.CaptifySiteAuth || {};
+      if (!A.fetchPlans) return;
+      A.fetchPlans().then(function (plans) {
+        if (!plans || !plans.length) return;
+        var box = document.getElementById("plan-teaser");
+        if (!box) return;
+        box.replaceChildren();
+        plans.forEach(function (p) {
+          var line = document.createElement("p");
+          line.className = "m-0";
+          var head = document.createElement("span");
+          head.className = "font-bold";
+          head.textContent = p.name + " · $" + p.price_monthly_usd;
+          var tail = document.createElement("span");
+          tail.className = "text-muted";
+          tail.textContent = " — " + Number(p.minutes || 0).toLocaleString("en-US") + " min/mo";
+          line.appendChild(head);
+          line.appendChild(document.createTextNode(" "));
+          line.appendChild(tail);
+          box.appendChild(line);
+        });
+      }).catch(function () { /* static fallback stays */ });
+    })();
+  </script>
   <script>
     // Hero player: cycle through translated caption samples.
     (function () {

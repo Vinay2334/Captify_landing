@@ -29,36 +29,22 @@ window.CaptifySite = {
   // `https://{checkout,test.checkout}.dodopayments.com/buy/{product_id}`.
   // TEST MODE uses test.checkout.dodopayments.com and test products; LIVE
   // uses checkout.dodopayments.com and live products — switch this base
-  // (and the product IDs) when you go live. Per Dodo's docs, payment links
-  // take `redirect_url` (required — where Dodo sends the customer back,
-  // appending payment_id/status/email), `email` to pre-fill, and custom
-  // fields as `metadata_*` (e.g. metadata_user_id). Native checkout links
-  // need no SDK and no npm install.
+  // when you go live. Per Dodo's docs, payment links take `redirect_url`
+  // (required — where Dodo sends the customer back, appending
+  // payment_id/status/email), `email` to pre-fill, and custom fields as
+  // `metadata_*` (e.g. metadata_user_id). Native checkout links need no
+  // SDK and no npm install.
   DODO_CHECKOUT_BASE: "https://test.checkout.dodopayments.com/buy",
 
-  // One entry per paid plan. `dodoProductId` is the ONLY value you must
-  // replace with a real Dodo product id. `id` must match the `plans.id`
-  // row in Supabase (see supabase/migrations/20261112000000_auth_quota.sql
-  // for the `free` seed; add `pro` and `studio` rows there).
-  PLANS: [
-    {
-      id: "free",
-      name: "Starter",
-      priceMonthlyUSD: 0,
-      // Free plan: no checkout — the extension signs users up on this plan.
-      dodoProductId: null,
-    },
-    {
-      id: "pro",
-      name: "Pro",
-      priceMonthlyUSD: 12,
-      dodoProductId: "pdt_0Ns4n6DtVvE5GFaoMwVqt",
-    },
-    {
-      id: "studio",
-      name: "Studio",
-      priceMonthlyUSD: 29,
-      dodoProductId: "pdt_0Ns4qzhAbSngnV0wZOLYf",
-    },
-  ],
+  // FastAPI backend origin (must match where `uvicorn app.main:app`
+  // listens). The pricing page fetches the plan catalog and the signed-in
+  // user's quota from here; the extension has its own copy of this URL.
+  BACKEND_BASE_URL: "http://127.0.0.1:8000",
+
+  // Plan content (names, prices, features, order, highlight) is NOT
+  // configured here: it comes from the `public.plans` table via
+  // GET /api/v1/plans, so the dashboard edits it with no redeploy.
+  // The Dodo product behind each paid plan is linked server-side via
+  // DODO_PLAN_MAP (backend env); the catalog endpoint attaches it per
+  // plan as `dodo_product_id`.
 };

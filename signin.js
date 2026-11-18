@@ -31,12 +31,28 @@
     el.hidden = false;
   }
 
+  // Live catalog (DB-driven): the pending plan's Dodo product comes from
+  // GET /api/v1/plans, never from static config. Null until loaded (or
+  // when the backend is unreachable — then pending plans fall back to
+  // `next` instead of stranding the user).
+  var catalogPlans = null;
+  A.fetchPlans().then(function (plans) {
+    catalogPlans = plans;
+    if (catalogPlans && state.plan) refreshPlanTitle();
+  });
+
   function planById(id) {
-    var plans = cfg.PLANS || [];
+    var plans = catalogPlans || [];
     for (var i = 0; i < plans.length; i++) {
       if (plans[i].id === id) return plans[i];
     }
     return null;
+  }
+
+  function refreshPlanTitle() {
+    var title = document.getElementById("signin-title");
+    var plan = state.plan ? planById(state.plan) : null;
+    if (title && plan) title.textContent = "Sign in for " + plan.name;
   }
 
   function stashReturn(state) {
@@ -68,7 +84,8 @@
   // click that brought the user here), otherwise the `next` page.
   function continueUrl(state, user) {
     var plan = state.plan ? planById(state.plan) : null;
-    if (plan && plan.dodoProductId && user) {
+    // A plan without a Dodo product is not purchasable: fall back to next.
+    if (plan && plan.dodo_product_id && user) {
       var url = A.buildCheckoutUrl(plan, {
         userId: user.id,
         email: user.email || state.email || "",
@@ -161,12 +178,7 @@
 
     show("signin-form-wrap");
     if (state.email) emailInput.value = state.email;
-    if (state.plan) {
-      var plan = planById(state.plan);
-      if (plan) {
-        $("signin-title").textContent = "Sign in for " + plan.name;
-      }
-    }
+    refreshPlanTitle();
 
     function setMode(next) {
       mode = next;

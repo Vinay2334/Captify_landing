@@ -144,6 +144,48 @@ test("usable session returns its token without network", async () => {
   assert.equal(fetched, 0);
 });
 
+test("planStates highlights current and marks cheaper plans", () => {
+  const { auth } = loadAuth();
+  const plans = [
+    { id: "free", name: "Starter", price_monthly_usd: 0, dodo_product_id: null },
+    { id: "pro", name: "Pro", price_monthly_usd: 12, dodo_product_id: "pdt_pro" },
+    { id: "studio", name: "Studio", price_monthly_usd: 29, dodo_product_id: "pdt_studio" },
+  ];
+  assert.deepEqual(norm(auth.planStates(plans, "Pro")), [
+    { id: "free", isCurrent: false, isCheaper: true, canCheckout: false },
+    { id: "pro", isCurrent: true, isCheaper: false, canCheckout: true },
+    { id: "studio", isCurrent: false, isCheaper: false, canCheckout: true },
+  ]);
+});
+
+test("planStates without a current plan enables everything", () => {
+  const { auth } = loadAuth();
+  const plans = [
+    { id: "free", name: "Starter", price_monthly_usd: 0, dodo_product_id: null },
+    { id: "pro", name: "Pro", price_monthly_usd: 12, dodo_product_id: "pdt_pro" },
+  ];
+  assert.deepEqual(norm(auth.planStates(plans, null)), [
+    { id: "free", isCurrent: false, isCheaper: false, canCheckout: false },
+    { id: "pro", isCurrent: false, isCheaper: false, canCheckout: true },
+  ]);
+  // Unknown plan name degrades to signed-out (match by name, same table).
+  assert.deepEqual(
+    norm(auth.planStates(plans, "Nonexistent")).map((s) => s.isCurrent),
+    [false, false],
+  );
+});
+
+test("buildCheckoutUrl accepts catalog rows (snake_case product id)", () => {
+  const { auth } = loadAuth();
+  const url = auth.buildCheckoutUrl(
+    { id: "pro", dodo_product_id: "pdt_pro" },
+    { signedIn: true, userId: "u-1", email: "me@example.com" },
+  );
+  assert.ok(url.includes("/buy/pdt_pro?"));
+  assert.ok(url.includes("metadata_user_id=u-1"));
+  assert.equal(auth.buildCheckoutUrl({ id: "pro" }, { userId: "u-1" }), null);
+});
+
 test("stale session refreshes; rejected refresh clears the token", async () => {
   const good = {
     captifySiteSession: JSON.stringify({

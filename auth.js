@@ -281,9 +281,11 @@
 
   // Dodo static payment link for a plan. success.html is the required
   // redirect_url; metadata_user_id is what the backend webhook reads back
-  // (email first only when no user id is known).
+  // (email first only when no user id is known). Accepts catalog rows
+  // (dodo_product_id) as well as plain { id, dodoProductId } objects.
   function buildCheckoutUrl(plan, identity) {
-    if (!plan || !plan.dodoProductId) return null;
+    var productId = plan && (plan.dodo_product_id || plan.dodoProductId);
+    if (!plan || !productId) return null;
     var base = String(cfg().DODO_CHECKOUT_BASE || "").replace(/\/$/, "");
     var origin = "";
     try {
@@ -299,7 +301,7 @@
       qs.push("metadata_user_id=" + encodeURIComponent(identity.userId));
     }
     qs.push("metadata_plan_id=" + encodeURIComponent(plan.id));
-    return base + "/" + encodeURIComponent(plan.dodoProductId) + "?" + qs.join("&");
+    return base + "/" + encodeURIComponent(productId) + "?" + qs.join("&");
   }
 
   // Sign-in page URL preserving where to continue afterwards. `next` is an
@@ -312,6 +314,65 @@
     return "signin.html?" + qs.join("&");
   }
 
+  function backendUrl() {
+    return String(cfg().BACKEND_BASE_URL || "").replace(/\/$/, "");
+  }
+
+  // Backend endpoints the pricing page needs (see server_new/app/api).
+  function plansUrl() {
+    return backendUrl() + "/api/v1/plans";
+  }
+
+  function quotaUrl() {
+    return backendUrl() + "/api/v1/me/quota";
+  }
+
+  // Fetch the live plan catalog (DB-driven, no redeploy). Resolves to the
+  // plans array or null when the backend cannot be reached.
+  function fetchPlans() {
+    return fetch(plansUrl()).then(function (res) {
+      if (!res.ok) return null;
+      return res.json();
+    }).then(function (body) {
+      if (!body || !Array.isArray(body.plans)) return null;
+      return body.plans;
+    }).catch(function () {
+      return null;
+    });
+  }
+
+  // Per-plan UI state for the pricing page. Pure.
+  // currentPlanName is the plan name from the quota endpoint (null when
+  // signed out). Both sides read the same live table, so name matching
+  // stays consistent across renames — keep plan names unique.
+  // Returns [{ id, isCurrent, isCheaper, canCheckout }].
+  function planStates(plans, currentPlanName) {
+    var current = null;
+    if (currentPlanName) {
+      for (var i = 0; i < (plans || []).length; i++) {
+        if (plans[i] && plans[i].name === currentPlanName) {
+          current = plans[i];
+          break;
+        }
+      }
+    }
+    return (plans || []).map(function (p) {
+      var isCurrent =
+        !!current && p.id === current.id;
+      var isCheaper =
+        !!current &&
+        !isCurrent &&
+        Number(p.price_monthly_usd || 0) <
+          Number(current.price_monthly_usd || 0);
+      return {
+        id: p.id,
+        isCurrent: isCurrent,
+        isCheaper: isCheaper,
+        canCheckout: !!p.dodo_product_id,
+      };
+    });
+  }
+
   A.parseParams = parseParams;
   A.isUsable = isUsable;
   A.sessionFromFragment = sessionFromFragment;
@@ -320,6 +381,10 @@
   A.resolveIdentity = resolveIdentity;
   A.buildCheckoutUrl = buildCheckoutUrl;
   A.buildSigninUrl = buildSigninUrl;
+  A.plansUrl = plansUrl;
+  A.quotaUrl = quotaUrl;
+  A.fetchPlans = fetchPlans;
+  A.planStates = planStates;
   A.googleAuthorizeUrl = googleAuthorizeUrl;
   A.getAccessToken = getAccessToken;
   A.ensureUser = ensureUser;
