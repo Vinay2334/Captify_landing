@@ -18,7 +18,7 @@ window.CaptifySite = {
   // links the extension and Supabase redirect to. Serve this folder on the
   // same port (e.g. `python -m http.server 8080`) so the Dodo `redirect_url`
   // lands back here after test checkout.
-  SITE_URL: "http://localhost:8080",
+  SITE_URL: "https://captifylanding.netlify.app/",
 
   // Supabase project (public anon key only — same values as
   // extensionRTC/src/caption-overlay/lib/supabase-config.js).
@@ -39,7 +39,7 @@ window.CaptifySite = {
   // FastAPI backend origin (must match where `uvicorn app.main:app`
   // listens). The pricing page fetches the plan catalog and the signed-in
   // user's quota from here; the extension has its own copy of this URL.
-  BACKEND_BASE_URL: "http://127.0.0.1:8000",
+  BACKEND_BASE_URL: "https://130.210.75.41.sslip.io",
 
   // Plan content (names, prices, features, order, highlight) is NOT
   // configured here: it comes from the `public.plans` table via
