@@ -1,17 +1,28 @@
-/* Captify site — plain stylesheet, no frameworks, no build step. */
+/* Captify site — soft light theme: warm white + honey yellow.
+   No frameworks, no build step. All dynamic pages (pricing.js cards,
+   sign-in, verify, success) share these tokens. */
+
 :root {
-  --bg: #101418;
-  --panel: #171d23;
-  --panel-raised: #1e252d;
-  --line: #2a333d;
-  --text: #eef2f5;
-  --muted: #9aa6b1;
-  --accent: #e8a13c;
-  --accent-ink: #1a1206;
-  --good: #4caf7d;
-  --bad: #d96363;
-  --radius: 10px;
+  --bg: #ffffff;
+  --bg-soft: #fffbeb;        /* amber-50: gentle tint for bands */
+  --panel: #ffffff;
+  --panel-raised: #fffbeb;
+  --line: #f0e2b6;           /* soft honey border */
+  --line-strong: #e0cd93;
+  --text: #1c1917;           /* warm near-black for headings */
+  --body: #57534e;           /* warm gray for body copy */
+  --muted: #78716c;          /* secondary text only, 14px+ */
+  --accent: #fbbf24;         /* honey yellow fills */
+  --accent-hover: #f59e0b;
+  --accent-ink: #1c1917;     /* dark text on honey: high contrast */
+  --accent-text: #b45309;    /* amber-700: yellow-hue text that reads on white */
+  --good: #15803d;
+  --good-bg: #dcfce7;
+  --good-ink: #14532d;
+  --bad: #b91c1c;
+  --radius: 14px;
   --max: 1060px;
+  --shadow-card: 0 1px 2px rgba(28, 25, 23, 0.05), 0 10px 28px -18px rgba(180, 130, 20, 0.35);
 }
 
 * { box-sizing: border-box; }
@@ -19,12 +30,23 @@
 body {
   margin: 0;
   background: var(--bg);
-  color: var(--text);
+  color: var(--body);
   font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
   line-height: 1.55;
 }
 
-a { color: var(--accent); }
+h1, h2, h3 { color: var(--text); }
+
+a { color: var(--accent-text); }
+a:hover { color: #92400e; }
+
+::selection { background: #fde68a; }
+
+:focus-visible {
+  outline: 3px solid var(--accent-hover);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
 
 .wrap {
   max-width: var(--max);
@@ -34,6 +56,7 @@ a { color: var(--accent); }
 
 /* ---- header ---- */
 .site-head {
+  background: rgba(255, 255, 255, 0.92);
   border-bottom: 1px solid var(--line);
 }
 .site-head .wrap {
@@ -55,11 +78,12 @@ a { color: var(--accent); }
   justify-content: center;
   width: 30px;
   height: 30px;
-  border-radius: 8px;
+  border-radius: 9px;
   background: var(--accent);
   color: var(--accent-ink);
   font-weight: 800;
   margin-right: 8px;
+  box-shadow: inset 0 -2px 0 rgba(28, 25, 23, 0.12);
 }
 .site-head nav {
   margin-left: auto;
@@ -67,7 +91,7 @@ a { color: var(--accent); }
   gap: 16px;
 }
 .site-head nav a {
-  color: var(--muted);
+  color: var(--body);
   text-decoration: none;
   font-size: 15px;
 }
@@ -85,7 +109,7 @@ a { color: var(--accent); }
   font-weight: 750;
 }
 .hero p {
-  color: var(--muted);
+  color: var(--body);
   margin: 0 0 8px;
   font-size: 17px;
 }
@@ -93,7 +117,8 @@ a { color: var(--accent); }
   display: inline-block;
   margin-top: 10px;
   font-size: 14px;
-  color: var(--muted);
+  color: var(--accent-text);
+  background: var(--bg-soft);
   border: 1px solid var(--line);
   border-radius: 999px;
   padding: 4px 14px;
@@ -113,6 +138,7 @@ a { color: var(--accent); }
   background: var(--panel);
   border: 1px solid var(--line);
   border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
   padding: 24px;
   display: flex;
   flex-direction: column;
@@ -120,7 +146,7 @@ a { color: var(--accent); }
 }
 .plan.featured {
   background: var(--panel-raised);
-  border-color: var(--accent);
+  border-color: var(--accent-hover);
   border-width: 2px;
 }
 .plan-flag {
@@ -134,14 +160,14 @@ a { color: var(--accent); }
   border-radius: 999px;
   padding: 2px 12px;
 }
-/* Signed-in account's current plan: same flag treatment, good-tint. */
+/* Signed-in account's current plan: same flag treatment, green tint. */
 .plan.is-current {
   border-color: var(--good);
   border-width: 2px;
 }
 .plan-flag--current {
-  background: var(--good);
-  color: #0b1410;
+  background: var(--good-bg);
+  color: var(--good-ink);
 }
 /* Disabled plan buttons (current plan, unavailable downgrades,
    unconnected checkout): same ghost look, no pointer. */
@@ -173,6 +199,7 @@ a { color: var(--accent); }
   margin: 10px 0 2px;
   font-size: 30px;
   font-weight: 750;
+  color: var(--text);
 }
 .plan .price small {
   font-size: 14px;
@@ -180,7 +207,7 @@ a { color: var(--accent); }
   color: var(--muted);
 }
 .plan .tagline {
-  color: var(--muted);
+  color: var(--body);
   font-size: 14.5px;
   margin: 0 0 14px;
 }
@@ -213,7 +240,7 @@ a { color: var(--accent); }
 .btn {
   display: block;
   text-align: center;
-  border-radius: 8px;
+  border-radius: 10px;
   padding: 11px 16px;
   font-size: 15px;
   font-weight: 650;
@@ -226,31 +253,32 @@ a { color: var(--accent); }
   background: var(--accent);
   color: var(--accent-ink);
   border: none;
+  box-shadow: 0 1px 2px rgba(28, 25, 23, 0.08), 0 6px 16px -10px rgba(217, 119, 6, 0.7);
 }
-.btn-primary:hover { filter: brightness(1.07); }
+.btn-primary:hover { background: var(--accent-hover); }
 .btn-primary:disabled {
   opacity: 0.55;
   cursor: wait;
 }
 .btn-ghost {
-  background: transparent;
+  background: var(--bg);
   color: var(--text);
-  border-color: var(--line);
+  border-color: var(--line-strong);
 }
-.btn-ghost:hover { border-color: var(--muted); }
+.btn-ghost:hover { border-color: var(--accent-hover); background: var(--bg-soft); }
 
 /* ---- account bar (pricing) ---- */
 .account-bar {
   display: flex;
   align-items: center;
   gap: 12px;
-  background: var(--panel);
+  background: var(--bg-soft);
   border: 1px solid var(--line);
-  border-radius: var(--radius);
+  border-radius: 12px;
   padding: 10px 16px;
   margin-top: 18px;
   font-size: 14.5px;
-  color: var(--muted);
+  color: var(--body);
 }
 .account-bar a {
   margin-left: auto;
@@ -267,21 +295,22 @@ a { color: var(--accent); }
   display: block;
   font-size: 13.5px;
   font-weight: 600;
-  color: var(--muted);
+  color: var(--body);
   margin-bottom: 6px;
 }
 .field input {
   width: 100%;
   background: var(--bg);
-  border: 1px solid var(--line);
-  border-radius: 8px;
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
   padding: 11px 12px;
   color: var(--text);
   font-size: 15px;
 }
 .field input:focus {
   outline: none;
-  border-color: var(--accent);
+  border-color: var(--accent-hover);
+  box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.35);
 }
 .field input:disabled {
   opacity: 0.5;
@@ -299,21 +328,22 @@ a { color: var(--accent); }
 .switch-line {
   margin-top: 16px;
   font-size: 14.5px;
+  color: var(--body);
 }
 .linklike {
   background: none;
   border: none;
   padding: 0;
-  color: var(--accent);
+  color: var(--accent-text);
   font-size: inherit;
   font-weight: 650;
   cursor: pointer;
 }
-#signin-subtitle { margin-top: -6px; }
+#signin-subtitle { margin-top: -6px; color: var(--body); }
 
 /* ---- fine print / faq ---- */
 .fineprint {
-  color: var(--muted);
+  color: var(--body);
   font-size: 14px;
   padding: 18px 0 8px;
 }
@@ -330,9 +360,10 @@ a { color: var(--accent); }
 .faq summary {
   cursor: pointer;
   font-weight: 600;
+  color: var(--text);
 }
 .faq p {
-  color: var(--muted);
+  color: var(--body);
   font-size: 14.5px;
   margin: 6px 0 4px;
 }
@@ -349,7 +380,8 @@ a { color: var(--accent); }
 .status-card {
   background: var(--panel);
   border: 1px solid var(--line);
-  border-radius: var(--radius);
+  border-radius: 16px;
+  box-shadow: var(--shadow-card);
   padding: 30px;
   margin: 56px auto;
   max-width: 560px;
@@ -358,7 +390,7 @@ a { color: var(--accent); }
   font-size: 24px;
   margin: 0 0 10px;
 }
-.status-card p { color: var(--muted); }
+.status-card p { color: var(--body); }
 .status-card .ok { color: var(--good); font-weight: 700; }
 .status-card .err { color: var(--bad); font-weight: 700; }
 .status-card .actions {
@@ -373,7 +405,7 @@ a { color: var(--accent); }
   height: 26px;
   border-radius: 50%;
   border: 3px solid var(--line);
-  border-top-color: var(--accent);
+  border-top-color: var(--accent-hover);
   animation: spin 0.9s linear infinite;
   margin: 6px 0 12px;
 }
@@ -383,9 +415,9 @@ a { color: var(--accent); }
 @keyframes spin { to { transform: rotate(360deg); } }
 code.addr {
   display: block;
-  background: var(--bg);
+  background: var(--bg-soft);
   border: 1px solid var(--line);
-  border-radius: 6px;
+  border-radius: 8px;
   padding: 8px 10px;
   margin-top: 10px;
   word-break: break-all;

@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#FFFBEB" />
   <title>Captify — Live captions for anything you watch</title>
   <meta name="description" content="Captify adds real-time captions and translation to any tab: streams, video calls, classes, movies." />
   <script src="https://cdn.tailwindcss.com"></script>
@@ -11,36 +12,40 @@
       theme: {
         extend: {
           colors: {
-            ink: "#101418",
-            panel: "#171d23",
-            raised: "#1e252d",
-            line: "#2a333d",
-            paper: "#eef2f5",
-            muted: "#9aa6b1",
-            amber: "#e8a13c",
-            amberink: "#1a1206",
-            good: "#4caf7d",
+            paper: "#ffffff",
+            cream: "#fffbeb",
+            sand: "#fef3c7",
+            honey: "#fbbf24",
+            honeydeep: "#d97706",
+            clay: "#b45309",
+            cocoa: "#1c1917",
+            honeyline: "#f0e2b6",
+            leaf: "#15803d",
           },
           fontFamily: {
             sans: ['system-ui', '-apple-system', '"Segoe UI"', 'sans-serif'],
+          },
+          boxShadow: {
+            card: "0 1px 2px rgba(28,25,23,0.05), 0 10px 28px -18px rgba(180,130,20,0.35)",
+            cta: "0 1px 2px rgba(28,25,23,0.08), 0 6px 16px -10px rgba(217,119,6,0.7)",
           },
         },
       },
     };
   </script>
   <style>
-    /* Cinema motifs: filmstrip sprockets + marquee. Pure CSS, no assets. */
+    /* Filmstrip: warm tinted band with soft sprocket dots. Pure CSS. */
     .filmstrip {
-      --hole: rgba(238, 242, 245, 0.28);
-      background-color: #171d23;
+      --hole: rgba(217, 119, 6, 0.28);
+      background-color: #fffbeb;
       background-image:
         repeating-linear-gradient(90deg, var(--hole) 0 14px, transparent 14px 34px),
         repeating-linear-gradient(90deg, var(--hole) 0 14px, transparent 14px 34px);
       background-size: 100% 12px, 100% 12px;
       background-position: top 8px left 12px, bottom 8px left 12px;
       background-repeat: repeat-x;
-      border-top: 1px solid #2a333d;
-      border-bottom: 1px solid #2a333d;
+      border-top: 1px solid #f0e2b6;
+      border-bottom: 1px solid #f0e2b6;
     }
     .marquee-track {
       display: flex;
@@ -72,19 +77,24 @@
     @media (prefers-reduced-motion: reduce) {
       .blink-dot { animation: none; }
     }
+    :focus-visible {
+      outline: 3px solid #d97706;
+      outline-offset: 2px;
+      border-radius: 4px;
+    }
   </style>
 </head>
-<body class="bg-ink text-paper font-sans antialiased">
-  <header class="border-b border-line">
+<body class="bg-paper text-stone-600 font-sans antialiased">
+  <header class="border-b border-honeyline bg-paper/90">
     <div class="max-w-6xl mx-auto px-5 py-4 flex items-center gap-3">
-      <a href="index.html" class="text-lg font-bold no-underline text-paper">
-        <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-amber text-amberink font-extrabold mr-2">C</span>Captify
+      <a href="index.html" class="text-lg font-bold no-underline text-cocoa">
+        <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-honey text-cocoa font-extrabold mr-2">C</span>Captify
       </a>
       <nav class="ml-auto flex items-center gap-5 text-[15px]">
-        <a href="#where" class="text-muted hover:text-paper no-underline">Where it works</a>
-        <a href="#how" class="text-muted hover:text-paper no-underline">How it works</a>
-        <a href="pricing.html" class="text-muted hover:text-paper no-underline">Pricing</a>
-        <a href="pricing.html" class="bg-amber text-amberink font-semibold rounded-lg px-4 py-2 no-underline">See plans</a>
+        <a href="#where" class="text-stone-600 hover:text-cocoa no-underline">Where it works</a>
+        <a href="#how" class="text-stone-600 hover:text-cocoa no-underline">How it works</a>
+        <a href="pricing.html" class="text-stone-600 hover:text-cocoa no-underline">Pricing</a>
+        <a href="pricing.html" class="bg-honey text-cocoa font-semibold rounded-full px-4 py-2 no-underline shadow-cta hover:bg-amber-500">See plans</a>
       </nav>
     </div>
   </header>
@@ -93,44 +103,44 @@
     <!-- Hero: copy + mock video player with live captions -->
     <section class="max-w-6xl mx-auto px-5 pt-14 pb-10 grid gap-10 md:grid-cols-2 md:items-center">
       <div>
-        <h1 class="text-4xl leading-tight font-bold m-0">Live captions for anything you&nbsp;watch</h1>
-        <p class="text-muted text-lg mt-4 mb-2">
+        <h1 class="text-4xl leading-tight font-bold m-0 text-cocoa">Live captions for anything you&nbsp;watch</h1>
+        <p class="text-stone-600 text-lg mt-4 mb-2">
           Captify subtitles any tab in real time — streams, video calls,
           lectures, movies — and translates between 11 languages as it goes.
         </p>
-        <p class="text-muted text-[15px] mt-0">No uploads. No new apps. Just press play.</p>
+        <p class="text-stone-500 text-[15px] mt-0">No uploads. No new apps. Just press play.</p>
         <div class="flex flex-wrap gap-3 mt-6">
-          <a href="pricing.html" class="bg-amber text-amberink font-semibold rounded-lg px-6 py-3 no-underline">See plans</a>
-          <a href="#how" class="border border-line text-paper rounded-lg px-6 py-3 no-underline hover:border-muted">How it works</a>
+          <a href="pricing.html" class="bg-honey text-cocoa font-semibold rounded-full px-6 py-3 no-underline shadow-cta hover:bg-amber-500">See plans</a>
+          <a href="#how" class="bg-paper text-cocoa border border-stone-300 rounded-full px-6 py-3 no-underline hover:border-honeydeep hover:bg-cream">How it works</a>
         </div>
-        <p class="text-muted text-sm mt-4">Free Starter plan · 100 minutes a month · Cancel anytime</p>
+        <p class="text-stone-500 text-sm mt-4">Free Starter plan · 100 minutes a month · Cancel anytime</p>
       </div>
 
-      <!-- Mock player -->
-      <div class="rounded-xl overflow-hidden border border-line bg-panel" role="img" aria-label="Mock video player showing live translated captions">
-        <div class="aspect-video relative bg-black">
+      <!-- Mock player: the screen itself stays dark, like a real video -->
+      <div class="rounded-2xl overflow-hidden border border-honeyline bg-paper shadow-card" role="img" aria-label="Mock video player showing live translated captions">
+        <div class="aspect-video relative bg-stone-900">
           <img src="images/hero-watch.jpg" alt="Two people watching a foreign film on a big TV at night" class="absolute inset-0 w-full h-full object-cover" />
           <div class="absolute bottom-0 inset-x-0 h-1/2" style="background: linear-gradient(transparent, rgba(0,0,0,0.85));"></div>
           <div class="absolute top-3 left-3 flex items-center gap-2 text-xs font-semibold">
-            <span class="flex items-center gap-1.5 bg-black/70 rounded-full px-2.5 py-1">
+            <span class="flex items-center gap-1.5 bg-black/70 text-white rounded-full px-2.5 py-1">
               <span class="blink-dot inline-block w-2 h-2 rounded-full bg-red-500"></span> LIVE CAPTIONS
             </span>
-            <span id="player-lang" class="bg-black/70 rounded-full px-2.5 py-1 text-amber">EN → ES</span>
+            <span id="player-lang" class="bg-black/70 rounded-full px-2.5 py-1 text-honey">EN → ES</span>
           </div>
           <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
             <span class="flex items-center justify-center w-14 h-14 rounded-full bg-white/10 border border-white/30">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="#eef2f5" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="#ffffff" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
             </span>
           </div>
-          <p id="player-caption" class="caption-fade absolute bottom-8 inset-x-0 text-center px-6 text-lg font-semibold" style="text-shadow: 0 2px 6px rgba(0,0,0,0.9);">“La reunión empieza en cinco minutos.”</p>
-          <p class="absolute bottom-2 inset-x-0 text-center text-xs text-muted">Captify is listening to this tab</p>
+          <p id="player-caption" class="caption-fade absolute bottom-8 inset-x-0 text-center px-6 text-lg font-semibold text-white" style="text-shadow: 0 2px 6px rgba(0,0,0,0.9);">“La reunión empieza en cinco minutos.”</p>
+          <p class="absolute bottom-2 inset-x-0 text-center text-xs text-white/70">Captify is listening to this tab</p>
         </div>
-        <div class="px-4 py-3 flex items-center gap-3">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="#9aa6b1" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
-          <div class="flex-1 h-1.5 rounded bg-line overflow-hidden">
-            <div class="timeline-fill h-full bg-amber rounded"></div>
+        <div class="px-4 py-3 flex items-center gap-3 bg-paper">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="#78716c" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+          <div class="flex-1 h-1.5 rounded bg-stone-200 overflow-hidden">
+            <div class="timeline-fill h-full bg-honeydeep rounded"></div>
           </div>
-          <span class="text-xs text-muted">CC</span>
+          <span class="text-xs text-stone-500">CC</span>
         </div>
       </div>
     </section>
@@ -139,32 +149,32 @@
     <section class="filmstrip py-9 overflow-hidden" aria-label="Examples of places Captify captions">
       <div class="marquee-track px-5" id="film-track">
         <!-- set 1 -->
-        <div class="w-64 shrink-0 rounded-lg bg-raised border border-line p-3">
-          <p class="text-xs text-muted font-semibold mb-2">VIDEO CALL · Meet</p>
-          <div class="rounded overflow-hidden h-20 relative">
+        <div class="w-64 shrink-0 rounded-xl bg-paper border border-honeyline shadow-card p-3">
+          <p class="text-xs text-clay font-semibold mb-2">VIDEO CALL · Meet</p>
+          <div class="rounded-lg overflow-hidden h-20 relative">
             <img src="images/video-call.jpg" alt="Four people talking on a video call" loading="lazy" class="absolute inset-0 w-full h-full object-cover" />
-            <p class="absolute bottom-0 inset-x-0 text-center text-sm font-semibold px-2 pb-1.5" style="text-shadow: 0 1px 4px #000;">“…can everyone see my screen?”</p>
+            <p class="absolute bottom-0 inset-x-0 text-center text-sm font-semibold text-white px-2 pb-1.5" style="text-shadow: 0 1px 4px #000;">“…can everyone see my screen?”</p>
           </div>
         </div>
-        <div class="w-64 shrink-0 rounded-lg bg-raised border border-line p-3">
-          <p class="text-xs text-muted font-semibold mb-2">LECTURE · 2x speed</p>
-          <div class="rounded overflow-hidden h-20 relative">
+        <div class="w-64 shrink-0 rounded-xl bg-paper border border-honeyline shadow-card p-3">
+          <p class="text-xs text-clay font-semibold mb-2">LECTURE · 2x speed</p>
+          <div class="rounded-lg overflow-hidden h-20 relative">
             <img src="images/lecture.jpg" alt="Professor teaching an online physics lecture" loading="lazy" class="absolute inset-0 w-full h-full object-cover" />
-            <p class="absolute bottom-0 inset-x-0 text-center text-sm font-semibold px-2 pb-1.5" style="text-shadow: 0 1px 4px #000;">“…mitochondria are the powerhouse…”</p>
+            <p class="absolute bottom-0 inset-x-0 text-center text-sm font-semibold text-white px-2 pb-1.5" style="text-shadow: 0 1px 4px #000;">“…mitochondria are the powerhouse…”</p>
           </div>
         </div>
-        <div class="w-64 shrink-0 rounded-lg bg-raised border border-line p-3">
-          <p class="text-xs text-muted font-semibold mb-2">CINEMA · Late night</p>
-          <div class="rounded overflow-hidden h-20 relative">
+        <div class="w-64 shrink-0 rounded-xl bg-paper border border-honeyline shadow-card p-3">
+          <p class="text-xs text-clay font-semibold mb-2">CINEMA · Late night</p>
+          <div class="rounded-lg overflow-hidden h-20 relative">
             <img src="images/cinema.jpg" alt="Movie theater with a glowing epic film on screen" loading="lazy" class="absolute inset-0 w-full h-full object-cover" />
-            <p class="absolute bottom-0 inset-x-0 text-center text-sm font-semibold px-2 pb-1.5" style="text-shadow: 0 1px 4px #000;">“…you shall not pass!”</p>
+            <p class="absolute bottom-0 inset-x-0 text-center text-sm font-semibold text-white px-2 pb-1.5" style="text-shadow: 0 1px 4px #000;">“…you shall not pass!”</p>
           </div>
         </div>
-        <div class="w-64 shrink-0 rounded-lg bg-raised border border-line p-3">
-          <p class="text-xs text-muted font-semibold mb-2">SPORTS · Live</p>
-          <div class="rounded overflow-hidden h-20 relative">
+        <div class="w-64 shrink-0 rounded-xl bg-paper border border-honeyline shadow-card p-3">
+          <p class="text-xs text-clay font-semibold mb-2">SPORTS · Live</p>
+          <div class="rounded-lg overflow-hidden h-20 relative">
             <img src="images/stadium.jpg" alt="Football striker shooting at goal in a packed stadium at night" loading="lazy" class="absolute inset-0 w-full h-full object-cover" />
-            <p class="absolute bottom-0 inset-x-0 text-center text-sm font-semibold px-2 pb-1.5" style="text-shadow: 0 1px 4px #000;">“…and it's a last-minute goal!”</p>
+            <p class="absolute bottom-0 inset-x-0 text-center text-sm font-semibold text-white px-2 pb-1.5" style="text-shadow: 0 1px 4px #000;">“…and it's a last-minute goal!”</p>
           </div>
         </div>
       </div>
@@ -172,87 +182,87 @@
 
     <!-- Where it works: three distinct mock screens -->
     <section id="where" class="max-w-6xl mx-auto px-5 py-14">
-      <h2 class="text-2xl font-bold m-0">One extension, every screen</h2>
-      <p class="text-muted mt-2 mb-8">If it plays audio in a tab, Captify can caption it.</p>
+      <h2 class="text-2xl font-bold m-0 text-cocoa">One extension, every screen</h2>
+      <p class="text-stone-500 mt-2 mb-8">If it plays audio in a tab, Captify can caption it.</p>
 
       <div class="grid gap-5 md:grid-cols-3">
         <!-- Video call -->
-        <div class="rounded-xl border border-line bg-panel p-4">
-          <div class="rounded-lg overflow-hidden mb-3 relative">
+        <div class="rounded-2xl border border-honeyline bg-paper shadow-card p-4">
+          <div class="rounded-xl overflow-hidden mb-3 relative">
             <img src="images/video-call.jpg" alt="Four colleagues talking on a video call" loading="lazy" class="w-full h-44 object-cover" />
-            <p class="absolute bottom-2 inset-x-0 text-center text-sm font-semibold px-3" style="text-shadow: 0 1px 4px #000;">“…can everyone see my screen?”</p>
+            <p class="absolute bottom-2 inset-x-0 text-center text-sm font-semibold text-white px-3" style="text-shadow: 0 1px 4px #000;">“…can everyone see my screen?”</p>
           </div>
-          <p class="text-xs text-muted font-semibold mb-1">VIDEO CALLS</p>
-          <p class="text-[15px] font-semibold m-0">Follow standups and interviews in your language, live.</p>
+          <p class="text-xs text-clay font-semibold mb-1">VIDEO CALLS</p>
+          <p class="text-[15px] font-semibold m-0 text-cocoa">Follow standups and interviews in your language, live.</p>
         </div>
         <!-- Class -->
-        <div class="rounded-xl border border-line bg-panel p-4">
-          <div class="rounded-lg overflow-hidden h-44 mb-3 relative">
+        <div class="rounded-2xl border border-honeyline bg-paper shadow-card p-4">
+          <div class="rounded-xl overflow-hidden h-44 mb-3 relative">
             <img src="images/lecture.jpg" alt="Professor teaching an online physics lecture" loading="lazy" class="absolute inset-0 w-full h-full object-cover" />
-            <p class="absolute top-2 left-2 text-xs font-semibold bg-black/70 rounded-full px-2.5 py-1 m-0">PHYSICS 201 · Lecture 14</p>
+            <p class="absolute top-2 left-2 text-xs font-semibold bg-black/70 text-white rounded-full px-2.5 py-1 m-0">PHYSICS 201 · Lecture 14</p>
             <div class="absolute bottom-0 inset-x-0 px-3 pb-2" style="background: linear-gradient(transparent, rgba(0,0,0,0.85));">
-              <p class="text-sm text-muted m-0">…therefore the wave function collapses…</p>
-              <p class="text-sm font-semibold m-0 mt-1">…por lo tanto, la función de onda colapsa…</p>
+              <p class="text-sm text-white/70 m-0">…therefore the wave function collapses…</p>
+              <p class="text-sm font-semibold text-white m-0 mt-1">…por lo tanto, la función de onda colapsa…</p>
             </div>
           </div>
-          <p class="text-xs text-muted font-semibold mb-1">CLASSES &amp; COURSES</p>
-          <p class="text-[15px] font-semibold m-0">Keep up at 2x speed, in the language you think in.</p>
+          <p class="text-xs text-clay font-semibold mb-1">CLASSES &amp; COURSES</p>
+          <p class="text-[15px] font-semibold m-0 text-cocoa">Keep up at 2x speed, in the language you think in.</p>
         </div>
         <!-- Movies -->
-        <div class="rounded-xl border border-line bg-panel p-4">
-          <div class="rounded-lg overflow-hidden h-44 mb-3 relative">
+        <div class="rounded-2xl border border-honeyline bg-paper shadow-card p-4">
+          <div class="rounded-xl overflow-hidden h-44 mb-3 relative">
             <img src="images/cinema.jpg" alt="Movie theater with a glowing epic film on screen" loading="lazy" class="absolute inset-0 w-full h-full object-cover" />
-            <p class="absolute bottom-2 inset-x-0 text-center text-[15px] font-semibold m-0 px-3" style="text-shadow: 0 2px 6px #000;">“I have a bad feeling about this.”</p>
+            <p class="absolute bottom-2 inset-x-0 text-center text-[15px] font-semibold text-white m-0 px-3" style="text-shadow: 0 2px 6px #000;">“I have a bad feeling about this.”</p>
           </div>
-          <p class="text-xs text-muted font-semibold mb-1">STREAMS &amp; MOVIES</p>
-          <p class="text-[15px] font-semibold m-0">Foreign films, live sports, late-night episodes — subtitled.</p>
+          <p class="text-xs text-clay font-semibold mb-1">STREAMS &amp; MOVIES</p>
+          <p class="text-[15px] font-semibold m-0 text-cocoa">Foreign films, live sports, late-night episodes — subtitled.</p>
         </div>
       </div>
     </section>
 
     <!-- How it works -->
-    <section id="how" class="border-t border-line">
+    <section id="how" class="border-t border-honeyline bg-cream">
       <div class="max-w-6xl mx-auto px-5 py-14">
-        <h2 class="text-2xl font-bold m-0">Running in under a minute</h2>
+        <h2 class="text-2xl font-bold m-0 text-cocoa">Running in under a minute</h2>
         <ol class="list-none p-0 mt-8 grid gap-6 md:grid-cols-3">
-          <li class="border-t-2 border-amber pt-4">
-            <p class="text-3xl font-bold text-muted m-0">1</p>
-            <p class="font-semibold mt-2 mb-1">Install the extension</p>
-            <p class="text-muted text-[15px] m-0">Add Captify to Chrome. It lives in your toolbar, ready on every tab.</p>
+          <li class="border-t-2 border-honeydeep pt-4">
+            <p class="text-3xl font-bold text-honeydeep/40 m-0">1</p>
+            <p class="font-semibold mt-2 mb-1 text-cocoa">Install the extension</p>
+            <p class="text-stone-600 text-[15px] m-0">Add Captify to Chrome. It lives in your toolbar, ready on every tab.</p>
           </li>
-          <li class="border-t-2 border-amber pt-4">
-            <p class="text-3xl font-bold text-muted m-0">2</p>
-            <p class="font-semibold mt-2 mb-1">Sign in</p>
-            <p class="text-muted text-[15px] m-0">Email or Google. Every account starts on the free Starter plan.</p>
+          <li class="border-t-2 border-honeydeep pt-4">
+            <p class="text-3xl font-bold text-honeydeep/40 m-0">2</p>
+            <p class="font-semibold mt-2 mb-1 text-cocoa">Sign in</p>
+            <p class="text-stone-600 text-[15px] m-0">Email or Google. Every account starts on the free Starter plan.</p>
           </li>
-          <li class="border-t-2 border-amber pt-4">
-            <p class="text-3xl font-bold text-muted m-0">3</p>
-            <p class="font-semibold mt-2 mb-1">Press play anywhere</p>
-            <p class="text-muted text-[15px] m-0">Click the toolbar icon on any talking tab. Captions appear as it speaks.</p>
+          <li class="border-t-2 border-honeydeep pt-4">
+            <p class="text-3xl font-bold text-honeydeep/40 m-0">3</p>
+            <p class="font-semibold mt-2 mb-1 text-cocoa">Press play anywhere</p>
+            <p class="text-stone-600 text-[15px] m-0">Click the toolbar icon on any talking tab. Captions appear as it speaks.</p>
           </li>
         </ol>
       </div>
     </section>
 
     <!-- Pricing teaser -->
-    <section class="border-t border-line">
+    <section class="border-t border-honeyline">
       <div class="max-w-6xl mx-auto px-5 py-14 text-center">
-        <h2 class="text-2xl font-bold m-0">Start free, upgrade for more minutes</h2>
-        <p class="text-muted mt-3 mb-8">Monthly billing · Cancel anytime · Secure checkout by Dodo Payments</p>
+        <h2 class="text-2xl font-bold m-0 text-cocoa">Start free, upgrade for more minutes</h2>
+        <p class="text-stone-500 mt-3 mb-8">Monthly billing · Cancel anytime · Secure checkout by Dodo Payments</p>
         <div id="plan-teaser" class="flex flex-wrap justify-center gap-x-10 gap-y-3 text-left mb-8">
-          <p class="m-0"><span class="font-bold">Starter · $0</span> <span class="text-muted">— 100 min/mo</span></p>
-          <p class="m-0"><span class="font-bold">Pro · $12</span> <span class="text-muted">— 1,000 min/mo</span></p>
-          <p class="m-0"><span class="font-bold">Studio · $29</span> <span class="text-muted">— 4,000 min/mo</span></p>
+          <p class="m-0 text-cocoa"><span class="font-bold">Starter · $0</span> <span class="text-stone-500">— 100 min/mo</span></p>
+          <p class="m-0 text-cocoa"><span class="font-bold">Pro · $12</span> <span class="text-stone-500">— 1,000 min/mo</span></p>
+          <p class="m-0 text-cocoa"><span class="font-bold">Studio · $29</span> <span class="text-stone-500">— 4,000 min/mo</span></p>
         </div>
-        <a href="pricing.html" class="inline-block bg-amber text-amberink font-semibold rounded-lg px-8 py-3 no-underline">Compare all plans</a>
+        <a href="pricing.html" class="inline-block bg-honey text-cocoa font-semibold rounded-full px-8 py-3 no-underline shadow-cta hover:bg-amber-500">Compare all plans</a>
       </div>
     </section>
   </main>
 
-  <footer class="border-t border-line">
-    <div class="max-w-6xl mx-auto px-5 py-6 text-sm text-muted flex flex-wrap gap-x-6 gap-y-2">
+  <footer class="border-t border-honeyline">
+    <div class="max-w-6xl mx-auto px-5 py-6 text-sm text-stone-500 flex flex-wrap gap-x-6 gap-y-2">
       <span>Captify · Live captions anywhere you watch</span>
-      <a href="pricing.html" class="text-muted no-underline hover:text-paper ml-auto">Pricing</a>
+      <a href="pricing.html" class="text-stone-500 no-underline hover:text-cocoa ml-auto">Pricing</a>
     </div>
   </footer>
 
@@ -272,12 +282,12 @@
         box.replaceChildren();
         plans.forEach(function (p) {
           var line = document.createElement("p");
-          line.className = "m-0";
+          line.className = "m-0 text-cocoa";
           var head = document.createElement("span");
           head.className = "font-bold";
           head.textContent = p.name + " · $" + p.price_monthly_usd;
           var tail = document.createElement("span");
-          tail.className = "text-muted";
+          tail.className = "text-stone-500";
           tail.textContent = " — " + Number(p.minutes || 0).toLocaleString("en-US") + " min/mo";
           line.appendChild(head);
           line.appendChild(document.createTextNode(" "));
