@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Captify — My account</title>
+  <meta name="description" content="Your Captify profile: name, email, current plan and subtitle minutes quota." />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-head">
+    <div class="wrap">
+      <a class="brand" href="index.html"><span class="brand-mark">C</span>Captify</a>
+      <nav>
+        <a href="index.html">Home</a>
+        <a href="pricing.html">Pricing</a>
+        <a href="account.html" aria-current="page">My account</a>
+        <a data-webstore class="nav-cta" href="https://chromewebstore.google.com/" target="_blank" rel="noopener">Install extension</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap account">
+    <section class="hero hero-narrow">
+      <h1>My account</h1>
+      <p>Your profile, current plan, and subtitle minutes for this month.</p>
+    </section>
+
+    <div id="account-loading" class="plans-loading" aria-live="polite">
+      <div class="spinner" aria-hidden="true"></div>
+      <p>Loading your account…</p>
+    </div>
+
+    <!-- Signed out: gate before any profile renders. -->
+    <section id="account-signedout" class="status-card" hidden>
+      <h1>You're signed out</h1>
+      <p>Sign in to see your profile, plan, and minutes. Checkout and the extension stay linked to this account.</p>
+      <div class="actions">
+        <a id="account-signin" class="btn btn-primary" href="signin.html">Sign in</a>
+        <a class="btn btn-ghost" href="pricing.html">See plans</a>
+      </div>
+    </section>
+
+    <div id="account-views" hidden>
+      <!-- Profile: name, email, membership. Painted from the Supabase user. -->
+      <section class="card account-profile" aria-label="Profile">
+        <div class="account-identity">
+          <span id="account-avatar" class="avatar" aria-hidden="true">C</span>
+          <div>
+            <h2 id="account-name">–</h2>
+            <p id="account-email" class="account-email">–</p>
+          </div>
+          <span id="account-verified" class="pill" hidden></span>
+        </div>
+        <dl class="account-rows">
+          <div>
+            <dt>Member since</dt>
+            <dd id="account-created">–</dd>
+          </div>
+          <div>
+            <dt>User ID</dt>
+            <dd><code id="account-id">–</code></dd>
+          </div>
+        </dl>
+      </section>
+
+      <!-- Plan: matched against the live catalog by name (same rule as
+           pricing.js); falls back to the quota snapshot when offline. -->
+      <section class="card" aria-label="Current plan">
+        <p class="card-kicker">Current plan</p>
+        <h2 id="plan-name">–</h2>
+        <p id="plan-tagline" class="muted">–</p>
+        <p id="plan-price" class="plan-price">–</p>
+        <div class="actions">
+          <a class="btn btn-primary" href="pricing.html">Manage plan</a>
+          <a data-webstore class="btn btn-ghost" href="https://chromewebstore.google.com/" target="_blank" rel="noopener">Install extension</a>
+        </div>
+      </section>
+
+      <!-- Quota: billed in whole subtitle seconds (see backend quota.py);
+           shown here in minutes. Resets on the 1st of each month. -->
+      <section class="card" aria-label="Minutes usage">
+        <p class="card-kicker">Minutes this month</p>
+        <div id="quota-body">
+          <p class="quota-numbers"><strong id="quota-used">–</strong> of <span id="quota-limit">–</span> min used</p>
+          <div class="quota-bar" role="progressbar" aria-label="Subtitle minutes used" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="quota-bar">
+            <span id="quota-fill"></span>
+          </div>
+          <p id="quota-remaining" class="muted">–</p>
+          <p class="muted small">Minutes reset on the 1st of each month. Silent stretches and failed sessions bill 0.</p>
+        </div>
+        <div id="quota-error" hidden>
+          <p class="form-error">Usage couldn't load. Check your connection and try again.</p>
+          <div class="actions">
+            <button id="quota-retry" class="btn btn-ghost" type="button">Retry</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="account-signout">
+        <button id="account-signout" class="btn btn-ghost" type="button">Sign out</button>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-foot">
+    <div class="wrap">
+      Captify · Monthly plans in USD, taxes may apply at checkout ·
+      Payments securely processed by Dodo Payments ·
+      <a href="account.html">My account</a>
+    </div>
+  </footer>
+
+  <script src="site-config.js"></script>
+  <script src="auth.js"></script>
+  <script src="account.js"></script>
+</body>
+</html>

@@ -11,10 +11,13 @@ static host.
 | `index.html` | Landing page: cinema-themed pitch (mock player, filmstrip, where/how, plan teaser re-rendered from the catalog when the backend answers) |
 | `pricing.html` (+ `pricing.js`) | Payments page: plan cards rendered from `GET /api/v1/plans` (DB-driven — no redeploy to change them). Checkout is gated behind a site sign-in; buttons go to Dodo hosted links with `metadata_user_id`, or to `signin.html` first when signed out. The signed-in account's current plan is highlighted (from the quota endpoint); cheaper plans show as unavailable |
 | `signin.html` (+ `signin.js`) | Site sign-in / sign-up (email + Google) via Supabase Auth directly. Returns to `?next=` afterwards, or straight to a pending plan's Dodo checkout |
+| `account.html` (+ `account.js`) | My account: profile (name, email, member since, verification), current plan (live catalog matched by name), and minutes quota with usage bar from `GET /api/v1/me/quota`. Signed-out visitors get a sign-in gate (`?next=account.html`) |
 | `verify.html` (+ `verify.js`) | Internal only — reached from Supabase confirmation emails, linked from nowhere on the site (set as Site URL in Supabase) |
 | `success.html` | Dodo checkout return page (passed as `redirect_url` on every payment link) |
 
-Shared: `styles.css`, `site-config.js` (service wiring: Supabase project, Dodo base, backend origin), `auth.js` (Supabase session, checkout + API URL helpers, plan-state helper for `pricing.js` / `signin.js`).
+Shared: `styles.css`, `site-config.js` (service wiring: Supabase project, Dodo base, backend origin, Chrome Web Store URL), `auth.js` (Supabase session, checkout + API URL helpers, plan-state helper for `pricing.js` / `signin.js`, account helpers + store-link painter).
+
+Every navbar carries **My account** (`account.html`) and an **Install extension** button pointing at `CHROME_WEBSTORE_URL` in `site-config.js` — currently the store homepage until the listing is live, then swap in the full item URL. Pages mark the link with `data-webstore`; `auth.js` fills in the href on load so the URL lives in one place.
 
 ## Plans (monthly, USD)
 

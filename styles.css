@@ -88,6 +88,7 @@ a:hover { color: #92400e; }
 .site-head nav {
   margin-left: auto;
   display: flex;
+  align-items: center;
   gap: 16px;
 }
 .site-head nav a {
@@ -96,6 +97,25 @@ a:hover { color: #92400e; }
   font-size: 15px;
 }
 .site-head nav a:hover { color: var(--text); }
+/* Navbar store button (TransParrot-style: text links + one filled CTA).
+   Reads as a button but stays an <a> so it works with no JS. */
+.site-head nav a.nav-cta {
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 650;
+  border-radius: 999px;
+  padding: 7px 16px;
+  box-shadow: 0 1px 2px rgba(28, 25, 23, 0.08), 0 6px 16px -10px rgba(217, 119, 6, 0.7);
+  white-space: nowrap;
+}
+.site-head nav a.nav-cta:hover {
+  background: var(--accent-hover);
+  color: var(--accent-ink);
+}
+@media (max-width: 640px) {
+  .site-head .wrap { flex-wrap: wrap; }
+  .site-head nav { flex-wrap: wrap; gap: 10px 14px; }
+}
 
 /* ---- hero ---- */
 .hero {
@@ -266,6 +286,19 @@ a:hover { color: #92400e; }
   border-color: var(--line-strong);
 }
 .btn-ghost:hover { border-color: var(--accent-hover); background: var(--bg-soft); }
+/* Google sign-in: brand icon + label centered as one row. The SVG file
+   carries width/height attributes, so pin the rendered size here. */
+.btn-google {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+.btn-google img {
+  width: 18px;
+  height: 18px;
+  flex: none;
+}
 
 /* ---- account bar (pricing) ---- */
 .account-bar {
@@ -424,3 +457,162 @@ code.addr {
   color: var(--text);
   font-size: 13px;
 }
+
+/* ---- account page ---- */
+.account {
+  padding-bottom: 24px;
+}
+.hero-narrow {
+  padding: 40px 0 4px;
+}
+.hero-narrow h1 {
+  font-size: 30px;
+  margin: 0 0 8px;
+}
+.hero-narrow p {
+  margin: 0;
+  font-size: 16px;
+}
+.card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+  padding: 22px 24px;
+  margin-top: 18px;
+}
+.card h2 {
+  margin: 0;
+  font-size: 21px;
+}
+.card-kicker {
+  margin: 0 0 6px;
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--accent-text);
+}
+.card .actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+.card .actions .btn { width: auto; }
+.muted { color: var(--muted); }
+.small { font-size: 13.5px; }
+.account-identity {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.account-identity h2 { overflow-wrap: anywhere; }
+.account-email {
+  margin: 2px 0 0;
+  color: var(--body);
+  font-size: 14.5px;
+  overflow-wrap: anywhere;
+}
+.avatar {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-size: 22px;
+  font-weight: 800;
+  box-shadow: inset 0 -2px 0 rgba(28, 25, 23, 0.12);
+}
+.pill {
+  margin-left: auto;
+  flex: none;
+  font-size: 12.5px;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 3px 12px;
+  border: 1px solid var(--line-strong);
+  color: var(--body);
+  background: var(--bg-soft);
+  white-space: nowrap;
+}
+.pill-ok {
+  background: var(--good-bg);
+  border-color: var(--good-bg);
+  color: var(--good-ink);
+}
+.pill-warn {
+  background: #fef3c7;
+  border-color: #f0e2b6;
+  color: #92400e;
+}
+.account-rows {
+  margin: 16px 0 0;
+  padding: 0;
+  border-top: 1px solid var(--line);
+}
+.account-rows > div {
+  display: flex;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+}
+.account-rows dt {
+  flex: none;
+  width: 130px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--body);
+}
+.account-rows dd {
+  margin: 0;
+  font-size: 14.5px;
+  color: var(--text);
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+.account-rows dd code {
+  font-size: 12.5px;
+  word-break: break-all;
+}
+.plan-price {
+  margin: 8px 0 0;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text);
+}
+.quota-numbers {
+  font-size: 17px;
+  color: var(--body);
+  margin: 0 0 12px;
+}
+.quota-numbers strong {
+  font-size: 30px;
+  font-weight: 750;
+  color: var(--text);
+}
+.quota-bar {
+  height: 10px;
+  border-radius: 999px;
+  background: var(--bg-soft);
+  border: 1px solid var(--line);
+  overflow: hidden;
+}
+.quota-bar > span {
+  display: block;
+  height: 100%;
+  width: 0;
+  border-radius: 999px;
+  background: var(--accent);
+  transition: width 0.4s ease;
+}
+.quota-bar > span.quota-fill--low { background: var(--bad); }
+.quota-low { color: var(--bad); font-weight: 600; }
+.account-signout {
+  margin-top: 22px;
+}
+.account-signout .btn { width: auto; }

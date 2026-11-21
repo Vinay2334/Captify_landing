@@ -41,6 +41,11 @@ window.CaptifySite = {
   // user's quota from here; the extension has its own copy of this URL.
   BACKEND_BASE_URL: "https://130.210.75.41.sslip.io",
 
+  // Chrome Web Store listing for the extension (navbar + account page
+  // "Install extension" buttons). Points at the store homepage until the
+  // listing is live — then replace with the full item URL.
+  CHROME_WEBSTORE_URL: "https://chromewebstore.google.com/",
+
   // Plan content (names, prices, features, order, highlight) is NOT
   // configured here: it comes from the `public.plans` table via
   // GET /api/v1/plans, so the dashboard edits it with no redeploy.

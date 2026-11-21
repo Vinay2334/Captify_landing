@@ -327,6 +327,104 @@
     return backendUrl() + "/api/v1/me/quota";
   }
 
+  // Public store URL for the extension (single source of truth for the
+  // navbar / account "Install extension" buttons; the store homepage
+  // until the listing is live — see site-config.js).
+  function webstoreUrl() {
+    return String(
+      cfg().CHROME_WEBSTORE_URL || "https://chromewebstore.google.com/",
+    );
+  }
+
+  // Point every `a[data-webstore]` link at the store URL. Runs once the
+  // DOM is ready; pages only carry the marker attribute, never a copy of
+  // the URL. No-op without a DOM (e.g. node tests loading this file).
+  function paintWebstoreLinks() {
+    try {
+      if (typeof document === "undefined" || !document.querySelectorAll) return;
+      var url = webstoreUrl();
+      var links = document.querySelectorAll("a[data-webstore]");
+      for (var i = 0; i < links.length; i++) {
+        links[i].href = url;
+      }
+    } catch (e) {
+      /* static href fallback stays */
+    }
+  }
+
+  if (typeof document !== "undefined" && document.addEventListener) {
+    document.addEventListener("DOMContentLoaded", paintWebstoreLinks);
+  }
+
+  // Display name for the account page. Prefers the Supabase user_metadata
+  // first/last name (set at site sign-up), then full_name (Google), then
+  // the email handle. Pure.
+  function displayName(user) {
+    user = user || {};
+    var meta = user.user_metadata || {};
+    var first = String(meta.first_name || "").trim();
+    var last = String(meta.last_name || "").trim();
+    if (first || last) return [first, last].filter(Boolean).join(" ");
+    var full = String(meta.full_name || meta.name || "").trim();
+    if (full) return full;
+    var email = String(user.email || "");
+    var at = email.indexOf("@");
+    if (at > 0) return email.slice(0, at);
+    return "there";
+  }
+
+  // Normalize the GET /api/v1/me/quota snapshot for rendering. Tolerant:
+  // missing numbers become 0, remaining is derived when absent, and a
+  // plan object ({ name }) degrades to its name. Pure.
+  function normalizeQuota(snap) {
+    snap = snap || {};
+    var num = function (v) {
+      var n = Number(v);
+      return Number.isFinite(n) && n > 0 ? Math.floor(n) : 0;
+    };
+    var plan = snap.plan;
+    if (plan && typeof plan === "object") plan = plan.name || plan.id || "";
+    var used = num(
+      snap.used_seconds != null ? snap.used_seconds : snap.usedSeconds,
+    );
+    var limit = num(
+      snap.limit_seconds != null ? snap.limit_seconds : snap.limitSeconds,
+    );
+    var remaining =
+      snap.remaining_seconds != null
+        ? num(snap.remaining_seconds)
+        : snap.remainingSeconds != null
+          ? num(snap.remainingSeconds)
+          : Math.max(limit - used, 0);
+    return {
+      plan: String(plan || ""),
+      usedSeconds: used,
+      limitSeconds: limit,
+      remainingSeconds: remaining,
+      email: String(snap.email || ""),
+      userId: String(snap.user_id || snap.userId || ""),
+    };
+  }
+
+  // Signed-in user's quota snapshot ({ user_id, email, plan,
+  // used_seconds, limit_seconds, remaining_seconds }) or null when signed
+  // out / backend unreachable / token rejected.
+  function fetchQuota() {
+    return getAccessToken().then(function (token) {
+      if (!token) return null;
+      return fetch(quotaUrl(), {
+        headers: { Authorization: "Bearer " + token },
+      })
+        .then(function (res) {
+          if (!res.ok) return null;
+          return res.json();
+        })
+        .catch(function () {
+          return null;
+        });
+    });
+  }
+
   // Fetch the live plan catalog (DB-driven, no redeploy). Resolves to the
   // plans array or null when the backend cannot be reached.
   function fetchPlans() {
@@ -379,6 +477,11 @@
   A.readStored = readStored;
   A.saveSession = writeStored;
   A.resolveIdentity = resolveIdentity;
+  A.webstoreUrl = webstoreUrl;
+  A.paintWebstoreLinks = paintWebstoreLinks;
+  A.displayName = displayName;
+  A.normalizeQuota = normalizeQuota;
+  A.fetchQuota = fetchQuota;
   A.buildCheckoutUrl = buildCheckoutUrl;
   A.buildSigninUrl = buildSigninUrl;
   A.plansUrl = plansUrl;
